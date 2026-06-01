@@ -1,0 +1,406 @@
+{
+  "33AAECP3942K1ZC": {
+    "Broadcaster_Name": "POLIMER MEDIA PVT. LTD.",
+    "regex_patterns": {
+      "Broadcaster_Name": "For\\s+(POLIMER\\s+MEDIA\\s+PVT\\.\\s+LTD\\.)",
+      "Advertiser_Name": "TAX\\s+INVOICE\\s*\\n\\s*([^\\n]+)",
+      "Agency_Name": "([A-Z\\s.,()&'-]+)\\s*\\n\\s*[^\\n]+\\s*\\n\\s*[^\\n]+\\s*\\n\\s*Agency\\s*State:",
+      "Billing_Period": "([0-9]{2}-[A-Za-z]{3}-[0-9]{4}-[0-9]{2}-[A-Za-z]{3}-[0-9]{4})\\s*\\n\\s*Description of Service",
+      "PO_Number": "Client Name:\\s*\\n\\s*([A-Z0-9]+)",
+      "RO_Number": "([A-Za-z0-9/_-]+)\\s*\\n\\s*R\\.O\\.\\s*Number:",
+      "Invoice_Number": "([A-Z0-9/_-]+)\\s*\\n\\s*[0-9]{2}-[A-Za-z]{3}-[0-9]{4}\\s*\\n\\s*[^\\n]+\\s*\\n\\s*R\\.O\\.\\s*Number:",
+      "Invoice_Date": "([0-9]{2}-[A-Za-z]{3}-[0-9]{4})\\s*\\n\\s*[^\\n]+\\s*\\n\\s*R\\.O\\.\\s*Number:",
+      "Taxable_Amount": "For\\s+POLIMER\\s+MEDIA\\s+PVT\\.\\s+LTD\\.\\s*\\n\\s*([0-9,.]+)\\s*",
+      "IGST": "Add:\\s+IGST\\s+@18%\\s*\\n\\s*([0-9,.]+)\\s*",
+      "Total_Amount": "([0-9,]+)\\s*\\n\\s*Payable Amount",
+      "GSTIN": "GST\\s*Regn\\.\\s+No\\s*:\\s*([A-Z0-9]{15})",
+      "PAN": "PAN\\s+No\\s*:\\s*([A-Z0-9]{10})",
+      "State": "State\\s*Name\\s*:\\s*[\\n\\r]*\\s*([^\\n]+?)\\s*[\\n\\r]*\\s*GST\\s*Regn"
+    }
+  },
+  "29AABCW1035H1ZG": {
+    "Broadcaster_Name": "WRITEMEN MEDIA PRIVATE LIMITED",
+    "regex_patterns": {
+      "Broadcaster_Name": "^([A-Z\\s\\.]+)\\n",
+      "Advertiser_Name": "Client\\s*:\\s*\\n\\s*Invoice Period\\s*\\n\\s*:\\s*[^\\n]+\\s*\\n\\s*([^\\n]+)",
+      "Agency_Name": "Invoice\\s*No\\s*[\\n\\r]*\\s*[^\\n]+\\s*[\\n\\r]*\\s*([^\\n]+?)\\s*[\\n\\r]*\\s*Invoice\\s*Date",
+      "Billing_Period": "Invoice Period\\s*:\\s*([^\n]+)",
+      "RO_Number": "Ro No\\s*:\\s*([^\n]+)",
+      "Invoice_Number": "Invoice No\\s*:\\s*([^\n]+)",
+      "Invoice_Date": "Invoice Date\\s*:\\s*([^\n]+)",
+      "Brand": "Brand\\s*:\\s*([^\n]+)",
+      "Taxable_Amount": "Taxable Amount\\s*([\\d,\\.]+)",
+      "CGST": "CGST\\s+9%\\s*([\\d,\\.]+)",
+      "SGST": "SGST\\s+9%\\s*([\\d,\\.]+)",
+      "Total_Amount": "Amount Payable\\s*([\\d,\\.]+)",
+      "GSTIN": "GST No:([A-Z0-9]{15})",
+      "PAN": "PAN No:([A-Z0-9]{10})",
+      "State": "Bangalore-560022\\.([A-Z]+),India"
+    }
+  },
+  "29AADCM8510H1ZE": {
+    "Broadcaster_Name": "MATRIX PUBLICITIES AND MEDIA INDIA PVT. LTD.",
+    "regex_patterns": {
+      "Broadcaster_Name": "^(MATRIX PUBLICITIES AND MEDIA INDIA PVT\\. LTD\\.)",
+      "Advertiser_Name": "Brand Name\\s*:\\s*([A-Z]+)",
+      "Agency_Name": "Activity Details\\s*\\n\\s*([^\\n]+)",
+      "Channel_Name": "Summary of Channel wise No\\. of Spots\\s*\\nChannel\\s*\\nNo of Spots\\s*\\nNet Cost\\s*\\n([A-Z\\s]+)",
+      "Billing_Period": "Activity Month\\s*:\\s*([A-Za-z]{3}-[0-9]{4})",
+      "Invoice_Number": "Invoice Number\\s*:\\s*([A-Z0-9]+)",
+      "Invoice_Date": "Invoice Date\\s*:\\s*([0-9]{2}-[A-Za-z]{3}-[0-9]{4})",
+      "Brand": "Campaign Name\\s*:\\s*XIAOMI-(REDMI NOTE13 SERIES)",
+      "Taxable_Amount": "Total Chargeable\\s*([\\d,\\.]+)",
+      "CGST": "CGST\\s+\\d+\\.\\d+%(?:\\s*\\n)?\\s*([\\d,.]+)",
+      "SGST": "SGST\\s+[\\d.]+%(?:\\s*\\n|\\n)\\s*([\\d,]+\\.\\d{2})",
+      "Total_Amount": "Total amount\\s*:\\s*([\\d,\\.]+)",
+      "GSTIN": "GSTN No:([A-Z0-9]{15})",
+      "PAN": "PAN No:([A-Z0-9]{10})",
+      "State": "State\\s*:\\s*([A-Z]+)"
+    }
+  },
+  "29AADCM0507A1Z3": {
+    "Broadcaster_Name": "ABP NETWORK PRIVATE LIMITED",
+    "regex_patterns": {
+      "Broadcaster_Name": "ORIGINAL FOR RECIPIENT\\s*\\n\\s*(ABP NETWORK PRIVATE LIMITED)",
+      "Advertiser_Name": "Advertiser:\\s*\\n(XIAOMI TECHNOLOGY INDIA PRIVATE LIM\\s*\\nITED)",
+      "Agency_Name": "Bill to Party:\\s*\\n(GROUP M MEDIA INDIA PVT LTD)",
+      "Channel_Name": "Station\\s*\\n(ABP NEWS)",
+      "Billing_Period": "Activity Period:\\s*(\\d{2}\\.\\d{2}\\.\\d{4}\\s*to\\s*\\d{2}\\.\\d{2}\\.\\d{4})",
+      "RO_Number": "RO Number\\s*#\\s*([\\w\\d\\/]+)",
+      "Invoice_Number": "Invoice No:\\s*(\\d+)",
+      "Invoice_Date": "Invoice Date:\\s*(\\d{2}\\.\\d{2}\\.\\d{4})",
+      "Brand": "(XIAOMI REDMI13 SUSTENANCE)",
+      "Taxable_Amount": "Taxable Amount:\\s*([\\d,]+\\.\\d{2})",
+      "CGST": "CGST\\s*@\\s*9\\.00\\s*%\\s*([\\d,]+\\.\\d{2})",
+      "SGST": "SGST\\s*@\\s*9\\.00\\s*%\\s*([\\d,]+\\.\\d{2})",
+      "IGST": "IGST\\s*@\\s*18\\.00\\s*%\\s*([\\d,]+\\.\\d{2})",
+      "Total_Amount": "Invoice Value:\\s*([\\d,]+\\.\\d{2})",
+      "GSTIN": "GSTIN\\s*:\\s*([A-Z0-9]{15})",
+      "PAN": "PAN\\s*No\\.\\s*([A-Z0-9]{10})",
+      "State": "Country:\\s*\\n\\s*(Karnataka)"
+    }
+  },
+  "32AAECM1878R1ZW": {
+    "Broadcaster_Name": "MM TV Ltd.",
+    "regex_patterns": {
+      "Broadcaster_Name": "^(MM TV Ltd\\.)",
+      "Advertiser_Name": "Client\\s*:\\s*([^\\n]+)",
+      "Agency_Name": "To,\\s*\\n\\s*([^,\\n]+)",
+      "Channel_Name": "([A-Za-z ]+)\\s*\\nChannel:",
+      "Billing_Period": "Client\\s*:\\s*Xiaomi Technology India Private Limited\\.\\s*\\n\\s*Period\\s*:\\s*\\n\\s*TC\\s*No\\.\\s*:\\s*\\n\\s*Bill\\s*Date\\s*:\\s*\\n\\s*Bill\\s*No\\.\\s*:\\s*\\n\\s*[^\n]+\\s*\\n\\s*[^\n]+\\s*\\n\\s*[^\n]+\\s*\\n\\s*(\\d{2}-\\w{3}-\\d{4}\\s*To\\s*\\d{2}-\\w{3}-\\d{4})",
+      "PO_Number": "Client\\s*:\\s*Xiaomi Technology India Private Limited\\.\\s*\\n\\s*Period\\s*:\\s*\\n\\s*TC\\s*No\\.\\s*:\\s*\\n\\s*Bill\\s*Date\\s*:\\s*\\n\\s*Bill\\s*No\\.\\s*:\\s*\\n\\s*(\\d{10})",
+      "RO_Number": "R\\.O\\. #:\\s*([^ ]+)",
+      "Invoice_Number": "Client\\s*:\\s*Xiaomi Technology India Private Limited\\.\\s*\\n\\s*Period\\s*:\\s*\\n\\s*TC\\s*No\\.\\s*:\\s*\\n\\s*Bill\\s*Date\\s*:\\s*\\n\\s*Bill\\s*No\\.\\s*:\\s*\\n\\s*[^\n]+\\s*\\n\\s*[^\n]+\\s*\\n\\s*([^\\n]+)",
+      "Invoice_Date": "Client\\s*:\\s*Xiaomi Technology India Private Limited\\.\\s*\\n\\s*Period\\s*:\\s*\\n\\s*TC\\s*No\\.\\s*:\\s*\\n\\s*Bill\\s*Date\\s*:\\s*\\n\\s*Bill\\s*No\\.\\s*:\\s*\\n\\s*[^\n]+\\s*\\n\\s*(\\d{2}-\\w{3}-\\d{4})",
+      "Brand": "Xiaomi\\s*-\\s*(\\w+\\d+)\\s*Sustenance",
+      "Taxable_Amount": "Amount:\\s*([0-9,]+\\.[0-9]{2})",
+      "IGST": "Amount:\\s*[\\n\\r]*\\s*[^\\n]+\\s*[\\n\\r]*\\s*([0-9.,]+)\\s*[\\n\\r]*\\s*296,487\\.00",
+      "Total_Amount": "([0-9,]+\\.[0-9]{2})\\nBill Amount:",
+      "GSTIN": "GSTIN\\s*:\\s*([A-Z0-9]{15})",
+      "PAN": "PAN\\s*No\\.\\s*:\\s*([A-Z0-9]{10})",
+      "State": "MM\\s*TV\\s*Ltd\\.[^\\n]*\\n[^\\n]*[,]\\s*([A-Za-z]+),\\s*India\\."
+    }
+  },
+  "29AADCB0467E1ZV": {
+    "Broadcaster_Name": "Bangla Entertainment Private Limited",
+    "regex_patterns": {
+      "Broadcaster_Name": "TAX INVOICE\\s*Original for Recipient\\s*([^\\n]+)\\s*BEPL",
+      "Advertiser_Name": "([^\\n]+)\\s*\\nORCHID - BLOCK- 5",
+      "Agency_Name": "([^\\n]+)\\s*\\n29, FIFTH FLOOR,",
+      "Channel_Name": "Channel Ref\\. ([\\w\\s]+)\\s+\\d{10}",
+      "Billing_Period": "R\\.O\\.No\\s*:\\s*\\d+\\s*:\\s*(MAY\\d{4})",
+      "RO_Number": "R\\.O\\.No\\s*:\\s*\\d+\\s*:\\s*([A-Z0-9\\/]+)",
+      "Invoice_Number": "GST Inv\\. No\\.(\\d+)",
+      "Invoice_Date": "Date:\\s*(\\d{2}-[A-Z]{3}-\\d{4})",
+      "Brand": "XIAOMI\\s*-\\s*([A-Z0-9\\s]+)\\s*SUSTENANCE CREA",
+      "Taxable_Amount": "Amount:\\s*\\n\\s*\\d+\\s*([\\d,]+\\.\\d{2})\\s*\\nHSN/SAC Code\\.",
+      "CGST": "CGST @9\\.00% on\\s*\\nNet Amount\\s*:\\s*\\n\\s*([\\d,]+\\.\\d{2})",
+      "SGST": "SGST @9\\.00% on\\s*\\nNet Amount\\s*:'\\s*\\n\\s*([\\d,]+\\.\\d{2})",
+      "Total_Amount": "Amount Due:\\s*\\n\\s*([\\d,]+\\.\\d{2})",
+      "GSTIN": "GSTIN No\\.:([A-Z0-9]{15})\\s*\\nCIN:",
+      "PAN": "PAN No\\.:([A-Z0-9]{10})\\s*\\n\\s*\\nGSTIN No\\.:29AADCB0467E1ZV",
+      "State": "State: (Karnataka) - \\d{2}"
+    }
+  },
+  "29AABCS1728D1ZK": {
+    "Broadcaster_Name": "Culver Max Entertainment Pvt. Ltd.",
+    "regex_patterns": {
+      "Broadcaster_Name": "TAX INVOICE\\s*Original for Recipient\\s*([^\\n]+)",
+      "Advertiser_Name": "Page 1 of 1\\s*\\n\\s*([^\\n]+)",
+      "Agency_Name": "Sales Person:[^\\n]+\\s*\\n\\s*([^\\n]+)",
+      "Channel_Name": "Channel Ref\\.\\s*([^\\d\\n]+)\\s+\\d+",
+      "Billing_Period": "R\\.O\\.No\\s*:\\s*[^:]+:([A-Z]{3}\\d{4})",
+      "RO_Number": "R\\.O\\.No\\s*:\\s*([^\\n]+)",
+      "Invoice_Number": "GST Inv\\. No\\.(\\d+)",
+      "Invoice_Date": "Date:\\s*(\\d{2}-[A-Z]{3}-\\d{4})",
+      "Brand": "XIAOMI\\s*-\\s*([\\w\\s]+?)\\s*SUSTENANCE CREA",
+      "Taxable_Amount": "Amount:\\s*\\d+\\s*([\\d,]+\\.\\d{2})",
+      "CGST": "CGST @9\\.00% on\\s*Net Amount\\s*:\\s*([\\d,]+\\.\\d{2})",
+      "SGST": "SGST @9\\.00% on\\s*Net Amount\\s*:'\\s*([\\d,]+\\.\\d{2})",
+      "Total_Amount": "Amount Due:\\s*([\\d,]+\\.\\d{2})",
+      "GSTIN": "PAN No\\.:AABCS1728D\\s*\\n\\s*GSTIN No\\.:([A-Z0-9]{15})",
+      "PAN": "PAN No\\.:([A-Z0-9]{10})",
+      "State": "Bengaluru\\s+560042,\\s*India\\s*\\n\\s*\\n\\s*\\nState:\\s*([A-Za-z]+)"
+    }
+  },
+  "32AAACT8521G1ZM": {
+    "Broadcaster_Name": "The Mathrubhumi Printing & Publishing Co. Ltd.",
+    "regex_patterns": {
+      "Advertiser_Name": "60 days from date of invoice\\s*\\n\\s*[a-zA-Z0-9-]+\\s*\\n\\s*To\\s*\\n\\s*[a-zA-Z0-9-]+\\s*\\n\\s*(XIAOMI TECHNOLOGY INDIA PRIVATE LIMITED)",
+      "Agency_Name": ":\\s*(GROUP M MEDIA INDIA PRIVATE LIMITED)\\s*\\n[\\s\\S]*?\\nBill To",
+      "Channel_Name": "TELECAST CERTIFICATE\\s*\\nwww\\.mathrubhuminews\\.in\\s*\\n(?:[^\\n]*\\n){7}([^\\n]+)",
+      "Billing_Period": ":\\s*\\d{2}-[A-Za-z]{3}-\\d{4}\\s*to\\s*\\d{2}-[A-Za-z]{3}-\\d{4}\\s*\\n:\\s*(\\d{2}-[A-Za-z]{3}-\\d{4}\\s*to\\s*\\d{2}-[A-Za-z]{3}-\\d{4})\\s*\\n[\\s\\S]*?\\nBilling Period",
+      "PO_Number": "MO Number\\s*\\n([A-Z0-9]+)",
+      "RO_Number": "XIAOMI TECHNOLOGY INDIA PRIVATE LIMITED\\s*\\n([A-Z]{3}\\d{4}/[A-Z]{5}/\\d{5}/\\d{2})",
+      "Invoice_Number": "-{70,}\\n:\\s*([A-Z0-9-]+)\\s*\\n",
+      "Invoice_Date": ":\\s*([0-9]{2}\\.[0-9]{2}\\.[0-9]{4})\\s*\\n[\\s\\S]*?\\nInvoice Date",
+      "Brand": "Xiaomi-(Redmi13)",
+      "Taxable_Amount": "935\\.00\\s*[\\n\\r]*\\s*([0-9.,]+)\\s*[\\n\\r]*\\s*Total\\s*:",
+      "CGST": "130,90\\s*[\\n\\r]*\\s*([0-9.,]+)\\s*[\\n\\r]*\\s*[^\\n]+\\s*[\\n\\r]*\\s*Total\\s*:",
+      "SGST": "130,90\\s*[\\n\\r]*\\s*([0-9.,]+)\\s*[\\n\\r]*\\s*[^\\n]+\\s*[\\n\\r]*\\s*Total\\s*:",
+      "Total_Amount": "0\\.00\\s*[\\n\\r]*\\s*([0-9.,]+)\\s*[\\n\\r]*\\s*INR",
+      "GSTIN": "GSTIN\\s*\\.\\s*:\\s*([A-Z0-9]{15})",
+      "PAN": "PAN No\\.\\s*([A-Z]{5}[0-9]{4}[A-Z]{1})",
+      "State": "Thiruvananthapuram,[0-9]+\\s*\\n(Kerala),\\s*India"
+    }
+  },
+  "23AADCA4090Q1ZG": {
+    "Broadcaster_Name": "Enter 10 Television Pvt. Ltd.",
+    "regex_patterns": {
+      "Broadcaster_Name": "HSN/SAC CODE :\\s*\\n(Enter 10 Television Pvt\\. Ltd\\.)",
+      "Advertiser_Name": "Client\\s*\\n\\s*:\\s*([^\\n]+)",
+      "Agency_Name": "Agency\\s*\\n\\s*([^\\n]+)",
+      "Channel_Name": "Channel\\s*\\n\\s*:\\s*([^\\n]+)",
+      "Billing_Period": "Period From\\s*([0-9]{2}\\.[0-9]{2}\\.[0-9]{4}\\s*To\\s*[0-9]{2}\\.[0-9]{2}\\.[0-9]{4})",
+      "RO_Number": "RO NO\\s*&\\s*Date\\s*\\n\\s*:\\s*([A-Z0-9\\/]+)",
+      "Invoice_Number": "Invoice Number\\s*\\n\\s*([0-9]+)",
+      "Invoice_Date": "Invoice Date\\s*\\n\\s*:\\s*\\n\\s*:\\s*\\n[^\\n]+\\n([0-9]{2}\\.[0-9]{2}\\.[0-9]{4})",
+      "Brand": "Brand\\s*\\n\\s*:\\s*([^\\n]+)",
+      "Taxable_Amount": "Net Amount\\s*([0-9,]+\\.[0-9]{2})",
+      "IGST": "IGST\\s*\\n\\s*[0-9\\.]+\\s*%\\s*\\n\\s*([0-9,]+\\.[0-9]{2})",
+      "Total_Amount": "Total Amount Payable\\s*([0-9,]+\\.[0-9]{2})",
+      "GSTIN": "Company's GST No\\.:\\s*([A-Z0-9]{15})",
+      "PAN": "Company's PAN\\s*:\\s*([A-Z0-9]{10})",
+      "State": "IN\\s*,\\s*(Madhya Pradesh)\\s*State Code:"
+    }
+  },
+  "32AAHCA3961A1Z8": {
+    "Broadcaster_Name": "ASIANET NEWS NETWORK PVT LTD",
+    "regex_patterns": {
+      "Broadcaster_Name": "([^\\n]+)\\s*\\n\\s*Corp Office :",
+      "Agency_Name": "Advertiser\\s*\\nPan No:\\s*\\n(GROUPM MEDIA INDIA PVT LTD-BGLR)",
+      "Channel_Name": "Channel\\s*:\\s*\\n([A-Z0-9 ]+)",
+      "Billing_Period": "Invoice Type:\\s*\\n([^\n]+)",
+      "RO_Number": "\\n([^\\n]+)\\nAgency RO No\\.:",
+      "Invoice_Number": "XIAOMI\\s*\\n([A-Z0-9/-]+)",
+      "Invoice_Date": "(\\d{2}-[A-Za-z]{3}-\\d{4})\\s*\\n[^\\n]+\\s*\\n[^\\n]+\\s*\\nInvoice Date:",
+      "Brand": "Brand:\\s*\\n[^\\n]*\\n[^\\n]*\\n[^\\n]*\\n([A-Z]+)",
+      "Taxable_Amount": "Net Amount:\\s*\\n\\s*For ASIANET NEWS NETWORK PVT LTD\\s*\\n\\s*([0-9,]+\\.[0-9]{2})",
+      "IGST": "Add:\\s*IGST\\s*@18%\\s*\\n\\s*([0-9,]+\\.[0-9]{2})",
+      "Total_Amount": "\\s*([0-9,]+\\.[0-9])(?:[0-9]+)?\\s*\\n\\s*Total Due:",
+      "GSTIN": "(?s)U92100MH2008PTC181882\\s*\\n([A-Z0-9]{15})",
+      "PAN": "(?s)U92100MH2008PTC181882\\s*\\n[A-Z0-9]{15}\\s*\\n([A-Z0-9]{10})"
+    }
+  },
+  "29AAECA2935P1Z7": {
+    "Broadcaster_Name": "ASSOCIATED BROADCASTING COMPANY PVT LTD",
+    "regex_patterns": {
+      "Broadcaster_Name": "^([^\n]+)\\s*\n#13/1",
+      "Advertiser_Name": "Advertiser\\s*\\n\\s*[^\\n]+\\n\\s*[^\\n]+\\n\\s*[^\\n]+\\n\\s*[^\\n]+\\n\\s*[^\\n]+\\n\\s*([^\\n]+)",
+      "Agency_Name": "Invoice Date\\n\\s*:\\s*\\d{2}/\\d{2}/\\d{4}\\s*\\n\\s*([^\\n]+)",
+      "Channel_Name": "Channel\\s*:\\s*([^\n]+)",
+      "Billing_Period": "Invoice Period\\s*:\\s*([^\n]+)",
+      "RO_Number": "Agency Ref\\.No\\s*:\\s*([^\n]+)",
+      "Invoice_Number": "Invoice Number\\s*:\\s*([^\n]+)",
+      "Invoice_Date": "Invoice Date\\s*:\\s*([\\d/]+)",
+      "Brand": "Brand\\s*:\\s*([^\n]+)",
+      "Taxable_Amount": "Net Amount\\s*([\\d,]+\\.\\d{2})",
+      "CGST": "CGST\\s*@\\s*9\\.00%:\\s*([\\d,]+\\.\\d{2})",
+      "SGST": "SGST\\s*@\\s*9\\.00%:\\s*([\\d,]+\\.\\d{2})",
+      "Total_Amount": "Grand Total\\s*([\\d,]+\\.\\d{2})",
+      "GSTIN": "GSTIN\\s*\n\\s*:\\s*([A-Z0-9]{15})",
+      "PAN": "PAN\\s*\n\\s*:\\s*([A-Z0-9]{10})",
+      "State": "#13/1, RHENIUS STREET, RICHMOND TOWN~BANGALORE-560025,([A-Z]+)"
+    }
+  },
+  "27AADCR6656D1ZA": {
+    "Broadcaster_Name": "IBN LOKMAT NEWS PVT LTD",
+    "regex_patterns": {
+      "Broadcaster_Name": "^([A-Z\\s]+?)\\s*\\n\\s*Particulars",
+      "Advertiser_Name": "Advertiser\\s*:\\s*([^\\n]+)",
+      "Agency_Name": "Legal Name\\s*:\\s*([^\\n]+)",
+      "Channel_Name": "Cost\\s*\\n\\s*([^\\n]+)",
+      "Billing_Period": "PAN\\s*No\\.\\s*:\\s*[\\n\\r]*\\s*([^\\n]+?)\\s*[\\n\\r]*\\s*State\\s*Name\\s*:",
+      "RO_Number": "XIAOMI MOBILES\\s*\\n\\s*[^\\n]+\\s*\\n\\s*[^\\n]+\\s*\\n\\s*([^\\n]+)",
+      "Invoice_Number": "Channel Contact\\s*:\\s*\\n\\s*[^\n]+\\n\\s*([^\n]+)",
+      "Invoice_Date": "XIAOMI MOBILES\\s*\\n\\s*[^\n]+\\s*\\n\\s*([^\n]+)",
+      "Brand": "Brand\\s*:\\s*\\n\\s*Billing Contact\\s*:\\s*\\n\\s*Channel Contact\\s*:\\s*\\n\\s*([^\\n]+)",
+      "Taxable_Amount": "Raj\\s*Kumar\\s*Camy\\s*[\\n\\r]*\\s*[^\\n]+\\s*[\\n\\r]*\\s*[^\\n]+\\s*[\\n\\r]*\\s*([0-9.,]+)\\s*[\\n\\r]*\\s*[^\\n]+\\s*[\\n\\r]*\\s*Amount\\s*\\(INR\\)",
+      "IGST": "Add:\\s*IGST\\s*@\\s*\\d+\\s*%\\s*\\n\\s*[\\u20B9\\s]*([\\d,]+\\.\\d{2})",
+      "Total_Amount": "Invoice Amount\\s*\\n\\s*[\\u20B9\\s]*([\\d,]+\\.\\d{2})",
+      "GSTIN": "Our PAN No\\.\\s*:\\s*[A-Z0-9]{10}\\s*\\n\\s*State Name\\s*:\\s*Maharashtra\\s*\\n\\s*State Code\\s*:\\s*27\\s*\\n\\s*GST No\\.\\s*:\\s*([A-Z0-9]{15})",
+      "PAN": "Our PAN No\\.\\s*:\\s*([A-Z0-9]{10})",
+      "State": "Our PAN No\\.\\s*:\\s*[A-Z0-9]{10}\\s*\\n\\s*State Name\\s*:\\s*([^\\n]+)"
+    }
+  },
+  "29AAACN1335Q1Z4": {
+    "Broadcaster_Name": "Star India Pvt. Ltd.",
+    "regex_patterns": {
+      "Broadcaster_Name": "(Star India Pvt\\. Ltd\\.)",
+      "Advertiser_Name": "Advertiser\\n\\s*([^\\n]+)",
+      "Agency_Name": "Agency\\(Customer\\)\\n\\s*([^\\n]+)",
+      "Channel_Name": "Station Relation\\n\\s*([^\\n]+)",
+      "Billing_Period": "Billing Period\\n\\s*([0-9/-]+)",
+      "RO_Number": "PO Number\\n\\s*([^\\n]+)",
+      "Invoice_Number": "Invoice No\\n\\s*([O0-9A-Z]+)",
+      "Invoice_Date": "Invoice Date\\n\\s*([0-9/]+)",
+      "Taxable_Amount": "Total Taxable Value\\n\\s*([0-9,.]+)",
+      "CGST": "CGST @ 9%\\n\\s*([0-9,.]+)",
+      "SGST": "SGST @ 9%\\n\\s*([0-9,.]+)",
+      "Total_Amount": "Total Due\\n\\s*([0-9,.]+)",
+      "GSTIN": "GSTIN:\\s*([A-Z0-9]{15})",
+      "PAN": "Permanent Account No\\.:\\s*([A-Z0-9]{10})",
+      "State": "State:\\s*([A-Za-z0-9\\-]+)"
+    }
+  },
+  "29AAACZ0243R1ZT": {
+    "Broadcaster_Name": "Zee Entertainment Enterprises Limited",
+    "regex_patterns": {
+      "Broadcaster_Name": "(Zee Entertainment Enterprises Limited)",
+      "Advertiser_Name": "Advertiser\\s*\\n\\s*Address\\s*\\n\\s*:\\s*\\n\\s*:\\s*\\n\\s*([^\\n]+)",
+      "Agency_Name": "Invoice To\\s*\\n\\s*Address\\s*\\n\\s*:\\s*\\n\\s*:\\s*\\n\\s*([^\\n]+)",
+      "Channel_Name": "Channel\\s*\\n\\s*GST Inv\\.\\s*No\\s*\\n\\s*Date\\s*\\n\\s*T\\.\\s*O\\.\\s*No\\s*\\n\\s*Channel\\s*Ref\\.\\s*\\n\\s*Cust\\.\\s*Ref\\.\\s*\\n\\s*(?::\\s*\\n\\s*){6}([^\\n]+)",
+      "Billing_Period": "([A-Z]{3}\\d{4})",
+      "RO_Number": "\\d{2}\\.\\d{2}\\.\\d{4}\\s*\\n\\s*([A-Z0-9]{8,15})\\b",
+      "Invoice_Number": "([A-Z0-9]{10,15})\\s*\\n\\s*\\d{2}\\.\\d{2}\\.\\d{4}",
+      "Invoice_Date": "[A-Z0-9]{10,15}\\s*\\n\\s*(\\d{2}\\.\\d{2}\\.\\d{4})",
+      "Brand": "Brand\\s*\\n\\s*:\\s*([^\\n]+)",
+      "Taxable_Amount": "Taxable\\s*\\n\\s*\\d+\\s*\\n\\s*([0-9,.]+)",
+      "CGST": "Add\\s*:\\s*9%\\s*CGST\\s*\\n\\s*([0-9,.]+)",
+      "SGST": "Add\\s*:\\s*9%\\s*SGST\\s*/\\s*UGST\\s*\\n\\s*([0-9,.]+)",
+      "Total_Amount": "Total Value \\(INR\\)\\s*\\n\\s*([0-9,.]+)",
+      "GSTIN": "GSTIN:([A-Z0-9]{15})",
+      "PAN": "PAN:([A-Z0-9]{10})",
+      "State": "Place of Supply\\s*\\n\\s*GSTIN/UIN\\s*\\n\\s*PAN\\s*\\n\\s*HSN Code\\s*\\n\\s*Desc\\.\\s*of\\s*Service\\s*\\n\\s*(?::\\s*\\n\\s*){5}([A-Za-z0-9\\s()]+)"
+    }
+  },
+  "36AACCM7226P1Z0": {
+    "Broadcaster_Name": "Eenadu Television Private Limited",
+    "regex_patterns": {
+      "Broadcaster_Name": "(EENADU TELEVISION PRIVATE LIMITED\\.)",
+      "Advertiser_Name": "ADVERTISER NAME\\s*\\n\\s*([A-Z\\s.,()&'-]+)",
+      "Agency_Name": "ORIGINAL INVOICE TO\\s*\\n\\s*([A-Z\\s.,()&'-]+)",
+      "Channel_Name": "([^\\n]+?)\\s*\\n\\s*Channel\\s*Name\\s*:|Channel\\s*Name\\s*:\\s*([^\\n]+)",
+      "Billing_Period": "([0-9]{2}\\s+[A-Za-z]{3}\\s+[0-9]{4}\\s*to\\s*[0-9]{2}\\s+[A-Za-z]{3}\\s+[0-9]{4})|activity\\s*period\\s*from\\s*\\n\\s*([0-9/]+)\\s*\\n\\s*To\\s*\\n\\s*([0-9/]+)",
+      "RO_Number": "RO No\\.:\\s*\\n?\\s*([A-Z0-9/_-]+)",
+      "Invoice_Number": "([0-9]+)\\s*\\n\\s*Invoice\\s*No\\.:|Reference\\s*Invoice\\s*No\\s*\\n\\s*([0-9]+)",
+      "Invoice_Date": "Invoice\\s*Date:\\s*\\n\\s*([0-9]{1,2}\\s+[A-Za-z]{3}\\s+[0-9]{4})|Reference\\s*Invoice\\s*Date\\s*\\n\\s*([0-9/]+)",
+      "Taxable_Amount": "Total Taxable Amount\\n\\s*([0-9,.]+)",
+      "IGST": "IGST \\(18%\\)\\n\\s*([0-9,.]+)",
+      "Total_Amount": "Invoice Amount\\n\\s*Rs\\.\\s*([0-9.,]+)|Total\\s*:\\s*\\d+\\s+([0-9.,]+)",
+      "GSTIN": "GSTN No\\. :\\s*([A-Z0-9]{15})",
+      "PAN": "PAN No\\.:\\s*([A-Z0-9]{10})",
+      "State": "Place of Supply :\\s*([A-Za-z]+)"
+    }
+  },
+  "29AADCS4885K1ZN": {
+    "Broadcaster_Name": "Sun TV Network Limited",
+    "regex_patterns": {
+      "Broadcaster_Name": "(SUN TV\\s+NETWORK\\s+LIMITED)",
+      "Advertiser_Name": "Agency\\s*GST\\s*/\\s*ISD\\s*No\\s*:\\s*\\n\\s*[^\\n]+\\s*\\n\\s*([^\\n]+)",
+      "Agency_Name": "Agency\\s*GST\\s*/\\s*ISD\\s*No\\s*:\\s*\\n\\s*(?:[^\\n]+\\s*\\n\\s*){4}([^\\n]+)",
+      "RO_Number": "RO\\s*Name\\s*\\n\\s*:\\s*\\n\\s*[^\\n]+\\s*\\n\\s*[^\\n]+\\s*\\n\\s*([A-Z0-9/_-]+)",
+      "PO_Number": "([A-Z0-9/_-]+)\\s*\\n\\s*RO\\s*Id",
+      "Invoice_Number": "RO\\s*Name\\s*\\n\\s*:\\s*\\n\\s*([0-9]+)",
+      "Invoice_Date": "RO\\s*Name\\s*\\n\\s*:\\s*\\n\\s*[0-9]+\\s*\\n\\s*([0-9]{2}\\.[0-9]{2}\\.[0-9]{4})",
+      "Taxable_Amount": "Amount\\s*Receivable\\s*\\n\\s*([0-9,.]+)\\s*\\n",
+      "CGST": "Amount\\s*Receivable\\s*\\n\\s*[0-9,.]+\\s*\\n\\s*([0-9,.]+)\\s*\\n",
+      "SGST": "Amount\\s*Receivable\\s*\\n\\s*(?:[0-9,.]+\\s*\\n\\s*){2}([0-9,.]+)\\s*\\n",
+      "Total_Amount": "Amount\\s*Receivable\\s*\\n\\s*(?:[0-9,.]+\\s*\\n\\s*){3}([0-9,.]+)\\s*\\n",
+      "Brand": "Agency\\s*GST\\s*/\\s*ISD\\s*No\\s*:\\s*\\n\\s*([^\\n]+)",
+      "GSTIN": "GSTIN\\s*:\\s*([A-Z0-9]{15})|GSTIN\\s*:([A-Z0-9]{15})",
+      "PAN": "PAN\\s*NO\\s*:\\s*([A-Z0-9]{10})|PAN\\s*NO\\s*:\\s*([A-Z0-9]{10})",
+      "State": "StateOfReceiver & PlaceOf Supply:\\s*\\n\\s*\\d+\\s*\\n\\s*([A-Za-z]+)"
+    }
+  },
+  "33AACCM2127K1ZQ": {
+    "Broadcaster_Name": "Mavis Satcom Limited",
+    "regex_patterns": {
+      "Broadcaster_Name": "(\\( A UNIT OF MAVIS SATCOM LIMITED\\))",
+      "Advertiser_Name": "([A-Z\\s.,()&'-]+)\\s*\\n\\s*State:-\\s*\\n\\s*State Code:-",
+      "Agency_Name": "([A-Z\\s.,()&'-]+)\\s*\\n\\s*2nd Floor, Mahalaxmi Chambers",
+      "Channel_Name": "([^\\n]+)\\s*\\n\\s*:\\s*\\n\\s*Advertiser",
+      "Invoice_Number": "([A-Z0-9/_-]+)\\s*\\n\\s*:\\s*\\n\\s*Invoice\\s*Number",
+      "Invoice_Date": "([0-9]{2}/[0-9]{2}/[0-9]{4})\\s*\\n\\s*:\\s*\\n\\s*Invoice\\s*Date",
+      "Billing_Period": "([0-9]{2}/[0-9]{2}/[0-9]{4}\\s*TO\\s*[0-9]{2}/[0-9]{2}/[0-9]{4})\\s*\\n\\s*:\\s*\\n\\s*Invoice\\s*Period",
+      "RO_Number": "([A-Za-z0-9/_-]+)\\s*\\n\\s*:\\s*\\n\\s*Agency\\s*Ro\\.Ref\\s*No",
+      "PO_Number": "([A-Za-z0-9/_-]+)\\s*\\n\\s*:\\s*\\n\\s*Deal\\s*Ref\\s*No",
+      "Brand": "([^\\n]+)\\s*\\n\\s*:\\s*\\n\\s*Brand",
+      "Taxable_Amount": "Net\\s*Amount\\s*Payable\\s*\\n\\s*([0-9,.]+)",
+      "IGST": "([0-9,]+\\.[0-9]{2})\\s*\\n\\s*@\\s*18\\.00%\\s*\\n\\s*IGST",
+      "Total_Amount": "([0-9,]+\\.[0-9]{2})\\s*\\n\\s*Invoice\\s*Value",
+      "GSTIN": "([A-Z0-9]{15})\\s*\\n\\s*:\\s*\\n\\s*Company\\s*GST\\s*No",
+      "PAN": "([A-Z0-9]{10})\\s*\\n\\s*:\\s*\\n\\s*PAN\\s*No",
+      "State": "BUSINESS PLACE:-([A-Z]+)"
+    }
+  },
+  "33AAACR3580P2Z1": {
+    "Broadcaster_Name": "Raj Television Network Ltd.",
+    "regex_patterns": {
+      "Broadcaster_Name": "(RAJ TELEVISION NETWORK LTD)",
+      "Advertiser_Name": "ADVERTISER\\s*\\n\\s*([^\\n]+)",
+      "Agency_Name": "AGENCY/CLIENT\\s*\\n\\s*([^\\n]+)",
+      "Channel_Name": "CHANNEL\\s*\\n\\s*([^\\n]+)",
+      "RO_Number": "RO No\\s*\\n\\s*([A-Z0-9/_-]+)",
+      "PO_Number": "RO Ref\\.No\\s*\\n\\s*([A-Z0-9/_-]+)",
+      "Invoice_Number": "Invoice No\\.\\s*\\n\\s*([A-Z0-9/_-]+)",
+      "Invoice_Date": "Invoice Date\\s*\\n\\s*([^\\n]+)",
+      "Brand": "Brand\\s*\\n\\s*([^\\n]+)",
+      "Billing_Period": "Activity Period\\s*\\n\\s*([^\\n]+)",
+      "Taxable_Amount": "Taxable Amount\\s*\\n\\s*([0-9.,]+)",
+      "IGST": "Tax Amount\\s*\\n\\s*([0-9.,]+)",
+      "Total_Amount": "Invoice Total\\s*\\n\\s*([0-9.,]+)",
+      "GSTIN": "Company GST No\\.:\\s*([A-Z0-9]{15})",
+      "PAN": "Company PAN No\\.:\\s*([A-Z0-9]{10})",
+      "State": "State\\s*:\\s*([A-Za-z]+)"
+    }
+  },
+  "36AADCR4877J1ZV": {
+    "Broadcaster_Name": "Rachana Television Pvt. Ltd.",
+    "regex_patterns": {
+      "Broadcaster_Name": "(RACHANA TELEVISION PVT\\. LTD\\.)",
+      "Advertiser_Name": "Client\\s*:\\s*([^\\n]+)",
+      "Agency_Name": "To\\s*([A-Za-z0-9\\s.,()-]+)\\s*\\n\\s*GSTIN\\s*:",
+      "Channel_Name": "Product\\s*:\\s*[^\\n]+\\s*\\n\\s*([A-Za-z0-9\\s]+TV)",
+      "RO_Number": "Agency R\\.O\\. No\\.:\\s*([^\\s]+)",
+      "Invoice_Number": "Invoice\\s*No\\.\\s*:\\s*\\n\\s*([A-Z0-9/_-]+)",
+      "Invoice_Date": "Invoice\\s*No\\.\\s*:\\s*\\n\\s*[^\\n]+\\s*\\n\\s*([0-9]{2}-[A-Za-z]{3}-[0-9]{4})",
+      "Billing_Period": "Invoice\\s*No\\.\\s*:\\s*\\n\\s*[^\\n]+\\s*\\n\\s*[^\\n]+\\s*\\n\\s*[^\\n]+\\s*\\n\\s*([0-9]{2}-[A-Za-z]{3}-[0-9]{4}\\s*To\\s*[0-9]{2}-[A-Za-z]{3}-[0-9]{4})",
+      "Taxable_Amount": "([0-9,]+\\.[0-9]{2})\\s*\\n\\s*Net Amount:",
+      "IGST": "([0-9,]+\\.[0-9]{2})\\s*\\n\\s*IGST\\s*@\\s*18\\.00\\s*%",
+      "Total_Amount": "Total Amount:\\s*\\n\\s*([0-9,.]+\\.[0-9]{2})",
+      "GSTIN": "PAN\\s*No\\.\\s*:\\s*[A-Z0-9]{10}\\s*\\n\\s*GSTIN\\s*:\\s*([A-Z0-9]{15})",
+      "PAN": "PAN No\\.\\s*:\\s*([A-Z0-9]{10})",
+      "State": "Place of Supply:([A-Za-z]+)"
+    }
+  },
+  "27AABCB5210F1Z8": {
+    "Broadcaster_Name": "B4U Broadband (India) Pvt. Ltd.",
+    "regex_patterns": {
+      "Broadcaster_Name": "(B4U BROADBAND \\(INDIA\\) PRIVATE LIMITED)",
+      "Advertiser_Name": "ADVERTISER:\\s*\\n\\s*([^\\n]+)",
+      "Agency_Name": "BILLED TO\\s*\\n\\s*([^\\n]+)",
+      "Channel_Name": "Channel:\\s*([^\\n]+)",
+      "Billing_Period": "Invoice Period:\\s*([^\\n]+)",
+      "RO_Number": "([A-Z0-9]+/TVBRO/[0-9A-Z/_-]+)",
+      "Invoice_Number": "Invoice Number:\\s*([A-Za-z0-9/_-]+)",
+      "Invoice_Date": "Invoice Date:\\s*([0-9-A-Za-z]+)",
+      "Taxable_Amount": "Value of taxable service\\s*\\n\\s*INR\\.\\s*([0-9.,]+)",
+      "IGST": "Add:\\s*IGST\\[18%\\]\\s*\\n\\s*INR\\.\\s*([0-9.,]+)",
+      "Total_Amount": "Total Value\\s*\\n\\s*INR\\.\\s*([0-9.,]+)",
+      "GSTIN": "GSTIN:\\s*([A-Z0-9]{15})",
+      "PAN": "PAN:\\s*([A-Z0-9]{10})",
+      "State": "Place Of Supply:\\s*([A-Za-z]+)"
+    }
+  }
+}
