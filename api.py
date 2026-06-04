@@ -79,7 +79,8 @@ async def extract_pdf(file: UploadFile = File(...)):
             
         elif kind == 'broadcaster_invoice':
             # Extract spots (runs completely offline)
-            spots = extractor.extract_broadcaster_invoice(temp_file_path, templates, TEMPLATES_PATH)
+            api_key = os.environ.get("GEMINI_API_KEY")
+            spots = extractor.extract_broadcaster_invoice(temp_file_path, templates, TEMPLATES_PATH, api_key=api_key)
             
             # Simple header extraction for response overview
             header = {}
