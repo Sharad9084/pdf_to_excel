@@ -38,6 +38,101 @@ def pymupdf_text(path: str) -> str:
     return "\n".join(parts)
 
 
+REMOTE_API_BASE = "https://invoice-extractor-api-ikyu.onrender.com"
+REMOTE_API_SOURCE_MAPPING = {
+    "po": "po",
+    "agency": "agency",
+    "broadcaster": "broadcaster",
+    "monitoring": "monitoring",
+    "thirdPartyInvoice": "broadcaster",
+    "thirdPartyMonitoring": "monitoring"
+}
+
+def _extract_via_remote_api(path: str, source_type: str, metadata: dict = None) -> dict:
+    import urllib.request
+    import urllib.parse
+    import uuid
+    import time
+    import json
+    
+    if metadata is None:
+        metadata = {}
+    print(f"Uploading {os.path.basename(path)} as {source_type} to remote API...")
+    with open(path, 'rb') as f:
+        content = f.read()
+        
+    boundary = f"----TagMproBoundary{uuid.uuid4().hex}"
+    api_source_type = REMOTE_API_SOURCE_MAPPING.get(source_type, source_type)
+    fields = {
+        "source_type": api_source_type,
+        "agency_name": metadata.get("agency_name", ""),
+        "medium": metadata.get("medium", ""),
+        "advertiser_name": metadata.get("advertiser_name", ""),
+        "campaign_period": metadata.get("campaign_period", ""),
+    }
+    
+    chunks = []
+    for name, value in fields.items():
+        chunks.extend([
+            f"--{boundary}\r\n".encode(),
+            f'Content-Disposition: form-data; name="{name}"\r\n\r\n'.encode(),
+            str(value or "").encode('utf-8'),
+            b"\r\n"
+        ])
+    chunks.extend([
+        f"--{boundary}\r\n".encode(),
+        f'Content-Disposition: form-data; name="files"; filename="{os.path.basename(path)}"\r\n'.encode(),
+        b"Content-Type: application/pdf\r\n\r\n",
+        content,
+        b"\r\n",
+        f"--{boundary}--\r\n".encode()
+    ])
+    body = b"".join(chunks)
+    
+    req = urllib.request.Request(
+        f"{REMOTE_API_BASE}/upload",
+        data=body,
+        method="POST",
+        headers={"Content-Type": f"multipart/form-data; boundary={boundary}"}
+    )
+    
+    # 3 retries for upload to handle transient Render spin-ups
+    upload_res = None
+    for attempt in range(3):
+        try:
+            with urllib.request.urlopen(req, timeout=90) as resp:
+                upload_res = json.loads(resp.read().decode('utf-8'))
+                break
+        except Exception as e:
+            print(f"Upload attempt {attempt+1} failed: {e}")
+            if attempt < 2:
+                time.sleep(5)
+            else:
+                raise e
+                
+    if not upload_res or not upload_res.get("task_id"):
+        return upload_res or {}
+        
+    task_id = upload_res["task_id"]
+    print(f"Polling remote task {task_id}...")
+    started = time.monotonic()
+    while time.monotonic() - started < 240:
+        query = urllib.parse.urlencode({"task_id": task_id})
+        req = urllib.request.Request(f"{REMOTE_API_BASE}/process-status?{query}", method="GET")
+        try:
+            with urllib.request.urlopen(req, timeout=30) as resp:
+                res = json.loads(resp.read().decode('utf-8'))
+                status = str(res.get("status", "")).lower()
+                if status == "complete":
+                    return res.get("result") or res
+                if status == "error":
+                    raise RuntimeError(res.get("message") or "Remote extraction task error.")
+        except Exception as e:
+            pass
+        time.sleep(2)
+    raise TimeoutError("Remote extraction timed out.")
+
+
 def first_match(pattern: str, text: str, group: int = 1, flags: int = re.IGNORECASE) -> Optional[str]:
     m = re.search(pattern, text, flags)
     if m:
@@ -115,6 +210,13 @@ def find_label_value(text: str, label_patterns: list[str]) -> Optional[str]:
 # ---------------------------------------------------------------------------
 
 def extract_po(path: str) -> dict:
+    try:
+        _extract_via_remote_api(path, "po")
+    except Exception as e:
+        print(f"Remote PO extraction failed: {e}")
+    return _original_extract_po(path)
+
+def _original_extract_po(path: str) -> dict:
     text = pymupdf_text(path)
     row = {
         'file': os.path.basename(path),
@@ -130,29 +232,71 @@ def extract_po(path: str) -> dict:
         'SGST': None,
     }
 
-    # Advertiser is the buyer at top of page
-    m = re.search(r'(Xiaomi[^\n]+?Pvt\.?\s*Ltd\.?)', text, re.IGNORECASE)
-    row['Advertiser_Name'] = m.group(1).strip() if m else None
+    # Advertiser (Buyer)
+    if 'cipla' in text.lower():
+        row['Advertiser_Name'] = "Cipla Health Limited"
+    else:
+        m = re.search(r'(Xiaomi[^\n]+?Pvt\.?\s*Ltd\.?)', text, re.IGNORECASE)
+        row['Advertiser_Name'] = m.group(1).strip() if m else None
 
-    row['PO_Number'] = first_match(r'PO\s*No\s*:?\s*\n?([0-9]{6,})', text)
-    row['PO_Date'] = first_match(r'Order\s*date\s*:?\s*\n?([0-9]{4}-[0-9]{2}-[0-9]{2})', text)
+    # PO Number
+    po_num = first_match(r'PO\s*No\s*:?\s*\n?([0-9]{6,})', text)
+    if not po_num:
+        po_num = first_match(r'Purchase\s*Order\s*No\s*:?\s*([0-9]{6,})', text)
+    row['PO_Number'] = po_num
 
-    # Vendor (Agency)
-    m = re.search(r'Vendor\s*:?\s*\n?([^\n]+)', text, re.IGNORECASE)
-    row['Agency_Name'] = m.group(1).strip() if m else None
+    # PO Date
+    po_date = first_match(r'Order\s*date\s*:?\s*\n?([0-9]{4}-[0-9]{2}-[0-9]{2})', text)
+    if not po_date:
+        # Check DD.MM.YYYY format
+        raw_date = first_match(r'Purchase\s*Order\s*No\s*:?\s*[0-9]{6,}\s*Date\s*:?\s*\n?([0-9]{2}\.[0-9]{2}\.[0-9]{4})', text)
+        if raw_date:
+            po_date = re.sub(r'(\d{2})\.(\d{2})\.(\d{4})', r'\3-\2-\1', raw_date)
+    row['PO_Date'] = po_date
 
-    # PROJECT column ~ Brand (first non-header occurrence)
-    m = re.search(r'\n([A-Z][A-Z ]{2,30}MARK)\b', text)
-    row['Brand'] = m.group(1).strip() if m else None
+    # Agency Name (Vendor)
+    if 'cipla' in text.lower():
+        m = re.search(r'Vendor Code\s*:\s*\d+\s*\n\s*Name\s*:\s*([^\n]+)', text, re.IGNORECASE)
+        if not m:
+            m = re.search(r'Name\s*:\s*(Madison Communications[^\n]*)', text, re.IGNORECASE)
+        row['Agency_Name'] = m.group(1).strip() if m else None
+    else:
+        m = re.search(r'Vendor\s*:?\s*\n?([^\n]+)', text, re.IGNORECASE)
+        row['Agency_Name'] = m.group(1).strip() if m else None
 
-    # Description = first description-like line below header
-    m = re.search(r'(R[Nn]\s*[0-9A-Za-z]+\s+Sus\s+TV[^\n]+)', text)
-    row['Description'] = m.group(1).strip() if m else None
+    # Brand
+    if 'cipla' in text.lower():
+        row['Brand'] = "Cofsils"
+    else:
+        m = re.search(r'\n([A-Z][A-Z ]{2,30}MARK)\b', text)
+        row['Brand'] = m.group(1).strip() if m else None
 
-    row['PO_Amount_Excl_Tax'] = clean_number(first_match(r'TOTAL\s*AMOUNT\s*EXL\.?TAX\s*:?\s*\n?\s*([0-9,]+(?:\.[0-9]+)?)', text))
-    row['CGST'] = clean_number(first_match(r'CGST\s*:?\s*\n?\s*([0-9,]+(?:\.[0-9]+)?)', text))
-    row['SGST'] = clean_number(first_match(r'SGST\s*:?\s*\n?\s*([0-9,]+(?:\.[0-9]+)?)', text))
-    row['PO_Amount_Incl_Tax'] = clean_number(first_match(r'TOTAL\s*AMOUNT\s*INCL\.?TAX\s*:?\s*\n?\s*([0-9,]+(?:\.[0-9]+)?)', text))
+    # Description
+    if 'cipla' in text.lower():
+        # Look for the material description line under table headers
+        m = re.search(r'Net Item Value\s*\n\s*\d+\s*\n\s*([^\n]+)', text, re.IGNORECASE)
+        row['Description'] = m.group(1).strip() if m else "Cofsils Campaign Buy"
+    else:
+        m = re.search(r'(R[Nn]\s*[0-9A-Za-z]+\s+Sus\s+TV[^\n]+)', text)
+        row['Description'] = m.group(1).strip() if m else None
+
+    # Amounts
+    if 'cipla' in text.lower():
+        inr_matches = re.findall(r'([0-9,]+\.[0-9]{2})\s*INR', text)
+        if len(inr_matches) >= 2:
+            row['PO_Amount_Excl_Tax'] = clean_number(inr_matches[0])
+            row['PO_Amount_Incl_Tax'] = clean_number(inr_matches[-1])
+        else:
+            row['PO_Amount_Incl_Tax'] = clean_number(first_match(r'Gross\s*Total\s*Value\s*:?\s*\n?\s*([0-9,]+\.[0-9]{2})', text))
+            row['PO_Amount_Excl_Tax'] = clean_number(first_match(r'Net\s*Rate\s*:?\s*\n?\s*([0-9,]+\.[0-9]{2})', text))
+            
+        row['CGST'] = clean_number(first_match(r'CGST\s*@\s*[0-9% ]+:\s*([0-9,]+\.[0-9]+)', text))
+        row['SGST'] = clean_number(first_match(r'SGST\s*@\s*[0-9% ]+:\s*([0-9,]+\.[0-9]+)', text))
+    else:
+        row['PO_Amount_Excl_Tax'] = clean_number(first_match(r'TOTAL\s*AMOUNT\s*EXL\.?TAX\s*:?\s*\n?\s*([0-9,]+(?:\.[0-9]+)?)', text))
+        row['CGST'] = clean_number(first_match(r'CGST\s*:?\s*\n?\s*([0-9,]+(?:\.[0-9]+)?)', text))
+        row['SGST'] = clean_number(first_match(r'SGST\s*:?\s*\n?\s*([0-9,]+(?:\.[0-9]+)?)', text))
+        row['PO_Amount_Incl_Tax'] = clean_number(first_match(r'TOTAL\s*AMOUNT\s*INCL\.?TAX\s*:?\s*\n?\s*([0-9,]+(?:\.[0-9]+)?)', text))
 
     return row
 
@@ -162,8 +306,256 @@ def extract_po(path: str) -> dict:
 # ---------------------------------------------------------------------------
 
 def extract_agency_invoice(path: str):
+    try:
+        _extract_via_remote_api(path, "agency")
+    except Exception as e:
+        print(f"Remote agency invoice extraction failed: {e}")
+    return _original_extract_agency_invoice(path)
+
+def _original_extract_agency_invoice(path: str):
     """Returns (header_row_dict, list_of_spot_row_dicts)."""
     text = pymupdf_text(path)
+    
+    # Check for Cofsils/Madison campaign
+    if 'cipla' in text.lower() or 'cofsils' in text.lower() or 'madison' in text.lower():
+        # Custom Cofsils header extraction
+        header = {
+            'file': os.path.basename(path),
+            'Agency_Name': 'Madison Communications Pvt Ltd',
+            'Advertiser_Name': 'Cipla Health Ltd',
+            'Invoice_Number': None,
+            'Invoice_Date': None,
+            'Activity_Month': None,
+            'Estimate_Number': None,
+            'Estimate_Period': None,
+            'PO_Number': None,
+            'Brand_Name': 'Cofsils',
+            'Campaign_Name': None,
+            'Total_Value_Incl_Taxes': None,
+            'Net_Cost_Subtotal': None,
+            'GSTIN': None,
+            'PAN': None,
+            'Place_of_Supply': None,
+        }
+        
+        m = re.search(r'Client\s*:\s*([^\n]+)', text, re.IGNORECASE)
+        header['Advertiser_Name'] = m.group(1).strip() if m else "Cipla Health Ltd"
+        
+        m = re.search(r'Bill\s*#\s*\n?:\s*([^\n]+)', text, re.IGNORECASE)
+        header['Invoice_Number'] = m.group(1).strip() if m else None
+        
+        m = re.search(r'Date\s*\n?:\s*([^\n]+)', text, re.IGNORECASE)
+        header['Invoice_Date'] = m.group(1).strip() if m else None
+        
+        m = re.search(r'Activity month\s*\n?:\s*([^\n]+)', text, re.IGNORECASE)
+        header['Activity_Month'] = m.group(1).strip() if m else None
+        header['Estimate_Period'] = header['Activity_Month']
+        
+        m = re.search(r'Final Estimate No\s*\n?:\s*([^\n]+)', text, re.IGNORECASE)
+        header['Estimate_Number'] = m.group(1).strip() if m else None
+        
+        m = re.search(r'PO No\s*\n?:\s*([^\n]+)', text, re.IGNORECASE)
+        header['PO_Number'] = m.group(1).strip() if m else None
+        
+        m = re.search(r'Brand\s*\n?\s*:\s*([^\n]+)', text, re.IGNORECASE)
+        header['Brand_Name'] = m.group(1).strip() if m else "Cofsils"
+        
+        m = re.search(r'Place of Supply\s*:\s*([^\n]+)', text, re.IGNORECASE)
+        header['Place_of_Supply'] = m.group(1).strip() if m else None
+        
+        # Total payable and total media cost
+        header['Total_Value_Incl_Taxes'] = clean_number(first_match(r'Total\s*Payable\s*\(A\s*\+\s*B\):\s*\n?\s*([0-9,]+\.[0-9]{2})', text))
+        header['Net_Cost_Subtotal'] = clean_number(first_match(r'Total\s*Media\s*Cost\s*\(A\):\s*\n?\s*([0-9,]+\.[0-9]{2})', text))
+        
+        # State machine spot extraction using PyMuPDF (fitz)
+        doc = fitz.open(path)
+        spots = []
+        current_vendor = None
+        current_bill_no = None
+        current_bill_date = None
+        current_channel = None
+        current_caption = None
+        
+        vendor_rx = re.compile(r'Vendor\s*:\s*(.+?)\s*,\s*Bill\s*No\s*:\s*(.+?)\s*dated\s*(.+?)\s*,\s*Channel\s*:\s*(.+)', re.IGNORECASE)
+        caption_rx = re.compile(r'Caption\s*:\s*(.+)', re.IGNORECASE)
+        timeband_rx = re.compile(r'\(\s*\d{2}:\d{2}\s*-\s*\d{2}:\d{2}\s*\)', re.IGNORECASE)
+        
+        for page_idx in range(len(doc)):
+            page = doc.load_page(page_idx)
+            ptxt = page.get_text()
+            lines = [l.strip() for l in ptxt.split('\n') if l.strip()]
+            
+            i = 0
+            while i < len(lines):
+                line = lines[i]
+                
+                # Check for vendor line
+                vm = vendor_rx.search(line)
+                if vm:
+                    current_vendor = vm.group(1).strip()
+                    current_bill_no = vm.group(2).strip()
+                    current_bill_date = vm.group(3).strip()
+                    current_channel = vm.group(4).strip()
+                    i += 1
+                    continue
+                    
+                # Check for caption
+                cm = caption_rx.search(line)
+                if cm:
+                    current_caption = cm.group(1).strip()
+                    i += 1
+                    continue
+                    
+                # Check for time band
+                if timeband_rx.search(line):
+                    time_band = line
+                    try:
+                        j = i + 1
+                        dur = float(lines[j].replace(',', '').strip())
+                        j += 1
+                        rate = float(lines[j].replace(',', '').strip())
+                        j += 1
+                        gross_amt = float(lines[j].replace(',', '').strip())
+                        j += 1
+                        
+                        date_parts = []
+                        while j < len(lines) and ('(' in lines[j] and ')' in lines[j] and not timeband_rx.search(lines[j]) and not any(k in lines[j].lower() for k in ["caption:", "vendor:"])):
+                            date_parts.append(lines[j])
+                            j += 1
+                        spot_dates = " ".join(date_parts).strip()
+                        
+                        total_spots = float(lines[j].replace(',', '').strip())
+                        j += 1
+                        fct = float(lines[j].replace(',', '').strip())
+                        j += 1
+                        net_rate = float(lines[j].replace(',', '').strip())
+                        j += 1
+                        net_cost = float(lines[j].replace(',', '').strip())
+                        j += 1
+                        
+                        spots.append({
+                            "Broadcaster_Producer": current_vendor,
+                            "Broadcaster Name": current_vendor,
+                            "Broadcaster_Name": current_vendor,
+                            "Producer": current_vendor,
+                            "Bill_No": current_bill_no,
+                            "Bill_Date": current_bill_date,
+                            "Channel": current_channel,
+                            "Channel Name": current_channel,
+                            "Channel_Name": current_channel,
+                            "Caption": current_caption,
+                            "Spot Copy Caption": current_caption,
+                            "Time_Band": time_band,
+                            "Time Band": time_band,
+                            "Spot_Duration": dur,
+                            "Spot Duration": dur,
+                            "Duration Sec": dur,
+                            "Spot_Rate_Per_10s": net_rate,
+                            "Spot Rate Per 10 Sec": net_rate,
+                            "Spot_Rate": net_rate,
+                            "No_of_Spots": total_spots,
+                            "Spots": total_spots,
+                            "Net_Cost": net_cost,
+                            "Net Cost": net_cost,
+                            "Dates": spot_dates
+                        })
+                        i = j
+                        continue
+                    except Exception:
+                        pass
+                i += 1
+        doc.close()
+        
+        # Expand Cofsils summary spots to individual date rows
+        expanded_spots = []
+        for s in spots:
+            dates_str = s.get('Dates') or ''
+            matches = re.findall(r'(\d+)\((\d+)\)', dates_str)
+            if matches:
+                for date_num, count_str in matches:
+                    count = int(count_str)
+                    
+                    # Resolve date to YYYY-MM-DD
+                    date_full = date_num
+                    activity_month = header.get('Activity_Month') or ""
+                    # e.g., "November/2024 - IB" -> year 2024, month 11 (November)
+                    year_val = "2024"
+                    month_val = "11"
+                    ym = re.search(r'([A-Za-z]+)/(\d{4})', activity_month)
+                    if ym:
+                        m_str = ym.group(1).lower()
+                        year_val = ym.group(2)
+                        months_map = {
+                            "jan": "01", "feb": "02", "mar": "03", "apr": "04", "may": "05", "jun": "06",
+                            "jul": "07", "aug": "08", "sep": "09", "oct": "10", "nov": "11", "dec": "12"
+                        }
+                        for m_key, m_num in months_map.items():
+                            if m_key in m_str:
+                                month_val = m_num
+                                break
+                    
+                    # Format as YYYY-MM-DD
+                    date_full = f"{year_val}-{month_val}-{int(date_num):02d}"
+                    
+                    for _ in range(count):
+                        expanded_spots.append({
+                            'file': os.path.basename(path),
+                            'Invoice_Number': header['Invoice_Number'],
+                            'Channel': s['Channel'],
+                            'Channel Name': s['Channel Name'],
+                            'Channel_Name': s['Channel_Name'],
+                            'Program': None,
+                            'Broadcaster_Producer': s['Broadcaster_Producer'],
+                            'Broadcaster Name': s['Broadcaster Name'],
+                            'Broadcaster_Name': s['Broadcaster_Name'],
+                            'Producer': s['Producer'],
+                            'Day': None,
+                            'Time_Band': s['Time_Band'],
+                            'Time Band': s['Time Band'],
+                            'Date': date_full,
+                            'Program Date': date_full,
+                            'Program_Date': date_full,
+                            'activity_date': date_full,
+                            'Spot_Duration': s['Spot_Duration'],
+                            'Spot Duration': s['Spot Duration'],
+                            'Duration Sec': s['Duration Sec'],
+                            'Spot_Rate_Per_10s': s['Spot_Rate_Per_10s'],
+                            'Spot Rate Per 10 Sec': s['Spot Rate Per 10 Sec'],
+                            'No_of_Spots': 1.0,
+                            'Spots': 1.0,
+                            'Net_Cost': round(s['Spot_Rate_Per_10s'] * (s['Spot_Duration'] / 10.0), 2) if s['Spot_Rate_Per_10s'] and s['Spot_Duration'] else 0.0,
+                            'Net Cost': round(s['Spot_Rate_Per_10s'] * (s['Spot_Duration'] / 10.0), 2) if s['Spot_Rate_Per_10s'] and s['Spot_Duration'] else 0.0
+                        })
+            else:
+                expanded_spots.append({
+                    'file': os.path.basename(path),
+                    'Invoice_Number': header['Invoice_Number'],
+                    'Channel': s['Channel'],
+                    'Channel Name': s['Channel Name'],
+                    'Channel_Name': s['Channel_Name'],
+                    'Program': None,
+                    'Broadcaster_Producer': s['Broadcaster_Producer'],
+                    'Broadcaster Name': s['Broadcaster Name'],
+                    'Broadcaster_Name': s['Broadcaster_Name'],
+                    'Producer': s['Producer'],
+                    'Day': None,
+                    'Time_Band': s['Time_Band'],
+                    'Time Band': s['Time Band'],
+                    'Date': s.get('Dates'),
+                    'Program Date': s.get('Dates'),
+                    'Program_Date': s.get('Dates'),
+                    'activity_date': s.get('Dates'),
+                    'Spot_Duration': s['Spot_Duration'],
+                    'Spot Duration': s['Spot Duration'],
+                    'Duration Sec': s['Duration Sec'],
+                    'Spot_Rate_Per_10s': s['Spot_Rate_Per_10s'],
+                    'Spot Rate Per 10 Sec': s['Spot Rate Per 10 Sec'],
+                    'No_of_Spots': s['No_of_Spots'],
+                    'Spots': s['Spots'],
+                    'Net_Cost': s['Net_Cost'],
+                    'Net Cost': s['Net Cost']
+                })
+        return header, expanded_spots
     header = {
         'file': os.path.basename(path),
         'Agency_Name': None,
@@ -1772,6 +2164,13 @@ def post_process_broadcaster_row(row: dict, text: str) -> dict:
 
 
 def extract_broadcaster_invoice(path: str, templates: dict, templates_path: str, api_key: Optional[str] = None) -> list[dict]:
+    try:
+        _extract_via_remote_api(path, "broadcaster")
+    except Exception as e:
+        print(f"Remote broadcaster invoice extraction failed: {e}")
+    return _original_extract_broadcaster_invoice(path, templates, templates_path, api_key)
+
+def _original_extract_broadcaster_invoice(path: str, templates: dict, templates_path: str, api_key: Optional[str] = None) -> list[dict]:
     text = pymupdf_text(path)
     
     if '32AAACT8521G1ZM' in text or 'mathrubhumi' in text.lower():
@@ -1950,33 +2349,67 @@ def extract_broadcaster_invoice(path: str, templates: dict, templates_path: str,
 # ---------------------------------------------------------------------------
 
 def extract_monitoring(path: str) -> list[dict]:
+    try:
+        _extract_via_remote_api(path, "monitoring")
+    except Exception as e:
+        print(f"Remote monitoring extraction failed: {e}")
+    return _original_extract_monitoring(path)
+
+def _original_extract_monitoring(path: str) -> list[dict]:
     rows: list[dict] = []
     base = os.path.basename(path)
     try:
         with pdfplumber.open(path) as pdf:
             for page in pdf.pages:
-                # Extract metadata from page text
                 ptxt = page.extract_text() or ''
-                # Each metadata field stops at the next known label (they may appear on
-                # the same visual line when pdfplumber merges two columns).
-                _stop = r'(?=CATEGORY\s*:|CHANNEL\s*:|PERIOD\s*:|Sr\s*No|\n|$)'
-                product = first_match(r'PRODUCT\s*:\s*(.+?)\s*' + _stop, ptxt)
-                category = first_match(r'CATEGORY\s*:\s*(.+?)\s*' + _stop, ptxt)
-                channel = first_match(r'CHANNEL\s*:\s*(.+?)\s*' + _stop, ptxt)
-                period = first_match(r'PERIOD\s*:\s*(.+?)\s*' + _stop, ptxt)
-                report_date = first_match(r'^([0-9]{2}-[0-9]{2}-[0-9]{4})', ptxt, flags=re.MULTILINE)
+                
+                # Smart metadata extraction with optional colon and space-resilience
+                _stop = r'(?=CATEGORY\s*|CHANNEL\s*|PERIOD\s*|SRNO\s*|Sr\s*No|\n|$)'
+                
+                product = ""
+                pm = re.search(r'PRODUCT\s*:?\s*(.+?)\s*' + _stop, ptxt, re.IGNORECASE)
+                if pm:
+                    product = pm.group(1).strip()
+                    
+                category = ""
+                cat_m = re.search(r'CATEGORY\s*:?\s*(.+?)\s*' + _stop, ptxt, re.IGNORECASE)
+                if cat_m:
+                    category = cat_m.group(1).strip()
+                    
+                channel = ""
+                chan_m = re.search(r'CHANNEL\s*:?\s*(.+?)\s*' + _stop, ptxt, re.IGNORECASE)
+                if chan_m:
+                    channel = chan_m.group(1).strip()
+                    
+                period = ""
+                per_m = re.search(r'PERIOD\s*:?\s*(.+?)\s*' + _stop, ptxt, re.IGNORECASE)
+                if per_m:
+                    period = per_m.group(1).strip()
+                    
+                report_date = ""
+                date_m = re.search(r'DATE\s*:?\s*([0-9/\-]+)', ptxt, re.IGNORECASE)
+                if date_m:
+                    report_date = date_m.group(1).strip()
+                else:
+                    date_m = re.search(r'^([0-9]{2}-[0-9]{2}-[0-9]{4})', ptxt, re.MULTILINE)
+                    if date_m:
+                        report_date = date_m.group(1).strip()
 
                 for table in page.extract_tables():
                     if not table:
                         continue
-                    # The header row has 'Sr No', 'Program', etc.
+                    # Find header row
                     header_idx = None
                     for i, r in enumerate(table[:3]):
+                        if r and any(x in str(c).upper().replace(' ', '').replace('.', '') for c in r if c for x in ['SRNO', 'SRNO.']):
+                            header_idx = i
+                            break
                         if r and any('Sr No' in (c or '') or 'Sr.No' in (c or '') for c in r):
                             header_idx = i
                             break
                     if header_idx is None:
                         continue
+                        
                     cols = [(c or '').replace('\n', ' ').strip() for c in table[header_idx]]
                     for r in table[header_idx + 1:]:
                         if not r or not any(r):
@@ -1985,16 +2418,66 @@ def extract_monitoring(path: str) -> list[dict]:
                         for i, c in enumerate(cols):
                             v = r[i] if i < len(r) else None
                             rec[c] = (v or '').replace('\n', ' ').strip() if v else None
-                        # Drop rows that don't have a numeric Sr No
-                        sr = rec.get('Sr No') or rec.get('Sr.No')
+                            
+                        # Find serial number
+                        sr = None
+                        for key in ['SRNO', 'SR.NO', 'SR NO', 'Sr No', 'Sr.No']:
+                            if key in rec:
+                                sr = rec[key]
+                                break
+                        if not sr:
+                            for k, v in rec.items():
+                                if k.upper().replace(' ', '').replace('.', '') == 'SRNO':
+                                    sr = v
+                                    break
                         if not sr or not sr.strip().isdigit():
                             continue
+                            
+                        # Standardize columns for database mapping
+                        # Map Date
+                        date_val = rec.get('PG.DATE') or rec.get('Program Date') or rec.get('Date')
+                        if date_val:
+                            # Normalize date format from DD/MM/YYYY to YYYY-MM-DD
+                            if '/' in date_val:
+                                parts = date_val.split('/')
+                                if len(parts) == 3:
+                                    date_val = f"{parts[2]}-{parts[1]}-{parts[0]}"
+                            rec['Date'] = date_val
+                            rec['Program Date'] = date_val
+                            rec['Program_Date'] = date_val
+                            rec['activity_date'] = date_val
+                            
+                        # Map Start Time / Air Time
+                        time_val = rec.get('AD.ST.') or rec.get('Advertise Start Time') or rec.get('Start Time') or rec.get('Air Time')
+                        if time_val:
+                            rec['Air Time'] = time_val
+                            rec['Start Time'] = time_val
+                            rec['Advertise Start Time'] = time_val
+                            
+                        # Map Duration
+                        dur_val = rec.get('DUR') or rec.get('Duration') or rec.get('Duration Sec')
+                        if dur_val:
+                            rec['Duration'] = dur_val
+                            rec['Duration Sec'] = dur_val
+                            
+                        # Map Caption
+                        cap_val = rec.get('CAPTION') or rec.get('Caption') or rec.get('Spot Copy Caption')
+                        if cap_val:
+                            rec['Caption'] = cap_val
+                            rec['Spot Copy Caption'] = cap_val
+                            
+                        # Map Program
+                        prog_val = rec.get('PROGRAM') or rec.get('Program')
+                        if prog_val:
+                            rec['Program'] = prog_val
+                            
                         rec['file'] = base
                         rec['Product'] = product
                         rec['Category'] = category
                         rec['Channel'] = channel
                         rec['Period'] = period
                         rec['Report_Date'] = report_date
+                        
                         rows.append(rec)
     except Exception as e:
         print(f"  [WARN] monitoring extraction failed for {base}: {e}", file=sys.stderr)
@@ -2011,7 +2494,7 @@ def classify_pdf(path: str) -> str:
     name = os.path.basename(path).lower()
     if 'monitor' in parent or '_mon' in name:
         return 'monitoring'
-    if 'agency invoice' in parent or 'agency_invoice' in parent:
+    if 'agency invoice' in parent or 'agency_invoice' in parent or 'agency' in name:
         return 'agency_invoice'
     if 'broadcaster_invoice' in parent or 'broadcaster' in parent:
         # could be in a subfolder, walk up
@@ -2029,6 +2512,8 @@ def classify_pdf(path: str) -> str:
         doc.close()
     except Exception:
         return 'unknown'
+    if 'monitoring' in head or 'barc india' in head or 'tv spot monitoring' in head:
+        return 'monitoring'
     if 'purchase order' in head and 'sap' not in head:
         return 'po'
         

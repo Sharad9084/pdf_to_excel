@@ -7,3 +7,8 @@ __pycache__/
 .gemini/
 venv/
 .env
+*.zip
+*.rar
+cofsils_data/
+cofsils_extracted_rar/
+cofsils_extraction_cache.json
